@@ -139,6 +139,37 @@ app.post("/delete", function (req, res) {
     res.redirect("/" + listName);
   }
 });
+
+// Custom route for dynamic lists
+app.get("/:customListName", function (req, res) {
+  const customListName = _.capitalize(req.params.customListName);
+
+  // Find a list with the custom list name
+  List.findOne({ name: customListName })
+    .then((foundList) => {
+      if (!foundList) {
+        // Create a new list if it doesn't exist
+        const list = new List({
+          name: customListName,
+          items: defaultItems,
+        });
+
+        list.save();
+        console.log("saved");
+        res.redirect("/" + customListName);
+      } else {
+        // Render the existing custom list
+        res.render("list", {
+          listTitle: foundList.name,
+          newListItems: foundList.items,
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
 // About Page
 app.get("/about", function (req, res) {
   res.render("about");
