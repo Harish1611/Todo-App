@@ -1,8 +1,13 @@
+const connectToMongo = require("./config");
+const dotenv = require("dotenv");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const _ = require("lodash");
 
+dotenv.config();
+
+connectToMongo();
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -10,9 +15,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.set("view engine", "ejs");
-
-// Set up default mongoose connection
-mongoose.connect("mongodb://127.0.0.1:27017/todolistDB");
 
 // Mongoose Schema for individual to-do list items
 const itemSchema = new mongoose.Schema({
