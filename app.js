@@ -50,6 +50,11 @@ const listSchema = {
 
 const List = mongoose.model("List", listSchema);
 
+// To Resolve the MIME Typeconfiguration error in Vercel Deployment
+app.get("/css/style.css", (req, res) => {
+  res.setHeader("Content-Type", "text/css");
+});
+
 // Default route for the home page
 app.get("/", function (req, res) {
   // Find all items in the collection
