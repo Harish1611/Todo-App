@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const path = require("path");
 
 dotenv.config();
 
@@ -15,12 +16,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // Mongoose Schema for individual to-do list items
 const itemSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
   },
 });
 
