@@ -70,7 +70,75 @@ app.get("/", function (req, res) {
       console.log(error);
     });
 });
+// Route for adding new items
+app.post("/", function (req, res) {
+  const itemName = req.body.newItem;
+  const listName = req.body.list;
 
+  // Check if itemName is not an empty string
+  if (itemName.trim() !== "") {
+    // Create a new item based on the input
+    const item = new Item({
+      name: itemName,
+    });
+
+    if (listName === "Today") {
+      // Save the item to the default collection
+      item.save();
+      res.redirect("/");
+    } else {
+      // Find the custom list and push the new item
+      List.findOne({ name: listName })
+        .then((foundItems) => {
+          foundItems.items.push(item);
+          foundItems.save();
+          res.redirect("/" + listName);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  } else {
+    if (listName === "Today") {
+      res.redirect("/");
+    } else {
+      List.findOne({ name: listName })
+        .then((foundItems) => {
+          res.redirect("/" + listName);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+});
+
+// Route for deleting items
+app.post("/delete", function (req, res) {
+  const listName = req.body.listName;
+  const checkItemId = req.body.checkbox;
+
+  // Delete the item from the default collection
+  if (listName == "Today") {
+    deleteCheckedItem();
+  } else {
+    // Find the custom list and pull the item from the array
+    deleteCustomItem();
+  }
+
+  async function deleteCheckedItem() {
+    await Item.deleteOne({ _id: checkItemId });
+    res.redirect("/");
+  }
+
+  async function deleteCustomItem() {
+    await List.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: checkItemId } } }
+    );
+    res.redirect("/" + listName);
+  }
+});
 // About Page
 app.get("/about", function (req, res) {
   res.render("about");
